@@ -13,7 +13,7 @@ export function initRenderer(dom, color) {
     obj = dom.getBoundingClientRect();
     width = obj.width;
     height = obj.height;
-    renderer = new t.WebGLRenderer({antialias : true, alpha: true});
+    renderer = new t.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(width, height);
     dom.appendChild(renderer.domElement);
     color && renderer.setClearColor(color[0], 1.0);
@@ -43,7 +43,7 @@ export function initCamera(para, data) {
     camera.up.x = _data.up ? _data.up[0] : 0;
     camera.up.y = _data.up ? _data.up[1] : 1;
     camera.up.z = _data.up ? _data.up[2] : 0;
-    _data.lookAt && camera.lookAt({x: _data.lookAt[0], y: _data.lookAt[1], z: _data.lookAt[2]});
+    _data.lookAt && camera.lookAt({ x: _data.lookAt[0], y: _data.lookAt[1], z: _data.lookAt[2] });
     return camera;
 }
 
@@ -56,7 +56,7 @@ export function initCamera(para, data) {
  */
 export function initLight(type, para, pos, scene) {
     let light;
-    switch(type) {
+    switch (type) {
         case 'point':
             light = new t.PointLight(...para);
             break;
@@ -77,13 +77,13 @@ export function initLight(type, para, pos, scene) {
  */
 export function initCube(geo, mat, scene) {
     let geometry = new t.CubeGeometry(...geo);
-    console.log(777777777,geometry.faceVertexUvs[0])
+    console.log(777777777, geometry.faceVertexUvs[0])
     let material = new t.MeshLambertMaterial(mat);
     // let uv = [new t.Vector2(0,0),new t.Vector2(1,0),new t.Vector2(1,1),new t.Vector2(0,1)];
-    let new_material = new t.MeshPhongMaterial({map: t.ImageUtils.loadTexture('/juminlou.jpg')});
+    let new_material = new t.MeshPhongMaterial({ map: t.ImageUtils.loadTexture('/juminlou.jpg') });
     let materials = [new_material, new_material, material, material, new_material, new_material];
     let mesh = new t.Mesh(geometry, materials);
-    scene && scene.add( mesh );
+    scene && scene.add(mesh);
     return mesh;
 }
 
@@ -92,26 +92,29 @@ export function initCube(geo, mat, scene) {
  * @geo  立方体属性 Array            [10,10,10]
  * @face 面贴图     Array            ['/face.jpg' 前, '' 后, '/face.jpg' 上, '' 下,'/face.jpg' 左, '' 右]     坐标系x轴正方向为前
  * @pos  立方体位置 Array            [10,10,10] 立方体的位置是立方体中心的位置
+ * @rotate 缩放     Array
+ * @repeat 贴图重复 Array
  * @scene 场景
  */
-export function createCube(geo, face, pos, scene) {
+export function createCube(geo, face, pos, rotate, repeat, scene) {
     let geometry = new t.CubeGeometry(...geo);
     let texture;
     let material = face.map(item => {
         if (item) {
-            texture = new t.TextureLoader().load(item)
+            texture = new t.TextureLoader().load(item);
             texture.wrapS = t.RepeatWrapping;
             texture.wrapT = t.RepeatWrapping;
-            // texture.repeat.set(1, 2);
-            return new t.MeshPhongMaterial({map: texture});
+            texture.repeat.set(...repeat);
+            return new t.MeshPhongMaterial({ map: texture });
         } else {
-            return new t.MeshLambertMaterial({color: 0x959595});
+            return new t.MeshLambertMaterial({ color: 0x959595 });
         }
     });
     let mesh = new t.Mesh(geometry, material);
     pos && mesh.position.set(...pos);
     !pos && mesh.position.set(geo[0] / 2, geo[1] / 2, geo[2] / 2);
-    scene && scene.add( mesh );
+    mesh.rotation.set(...rotate)
+    scene && scene.add(mesh);
     return mesh;
 }
 
@@ -125,7 +128,7 @@ export function initSphere(geo, mat, scene) {
     let geometry = new t.SphereGeometry(...geo);
     let material = new t.MeshBasicMaterial(mat);
     let mesh = new t.Mesh(geometry, material);
-    scene && scene.add( mesh );
+    scene && scene.add(mesh);
     return mesh;
 }
 
@@ -143,11 +146,11 @@ export function animation(fn) {
  * @scene 场景
  */
 export function initHelper(scene) {
-    let axis = new t.AxisHelper(200);
+    let axis = new t.AxesHelper(300);
     scene.add(axis);
 
-    // let grid = new t.GridHelper(200, 50, 0xFF0000, 0x00FF00);
-    // scene.add(grid);
+    let grid = new t.GridHelper(400, 20, 0xFF00FF, 0x00FF00);
+    scene.add(grid);
 }
 
 /***
@@ -167,11 +170,11 @@ export function initControler(camera, renderer, render) {
 export function loadModel(type, url, scene, fn) {
     let loader, model;
     let color = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0x00ffff, 0xff00ff, 0x950023];
-    switch(type) {
+    switch (type) {
         case 'gltf':
         default:
             loader = new GLTFLoader();
-            loader.load( url, function ( gltf ) {
+            loader.load(url, function(gltf) {
                 model = gltf.scene;
                 let i = 0;
                 // (function() {
@@ -214,11 +217,11 @@ export function loadModel(type, url, scene, fn) {
                 model.position.x = 0;
                 model.position.y = 0;
                 model.position.z = 0;
-                scene.add( model );
+                scene.add(model);
                 fn && fn(model);
-            }, undefined, function ( e ) {
-                console.error( e );
-            } );
+            }, undefined, function(e) {
+                console.error(e);
+            });
     }
 }
 
@@ -230,22 +233,22 @@ export function initClick(camera, scene, width, height, left, top) {
     let raycaster = new t.Raycaster();
     let mouse = new t.Vector2();
     //通过鼠标点击的位置计算出raycaster所需要的点的位置，以屏幕中心为原点，值的范围为-1到1.
-    mouse.x = ( e.clientX - left / width ) * 2 - 1;
-    mouse.y = - ( e.clientY - top / height ) * 2 + 1;
+    mouse.x = (e.clientX - left / width) * 2 - 1;
+    mouse.y = -(e.clientY - top / height) * 2 + 1;
 
     // 通过鼠标点的位置和当前相机的矩阵计算出raycaster
-    raycaster.setFromCamera( mouse, camera );
+    raycaster.setFromCamera(mouse, camera);
     console.log(camera, scene)
 
     // 获取raycaster直线和所有模型相交的数组集合
-    var intersects = raycaster.intersectObjects( scene.children );
+    var intersects = raycaster.intersectObjects(scene.children);
 
     console.log(intersects);
 
     //将所有的相交的模型的颜色设置为红色，如果只需要将第一个触发事件，那就数组的第一个模型改变颜色即可
-    for ( var i = 0; i < intersects.length; i++ ) {
+    for (var i = 0; i < intersects.length; i++) {
 
-        intersects[ i ].object.material.color.set( 0xff00ff );
+        intersects[i].object.material.color.set(0xff00ff);
 
     }
 }

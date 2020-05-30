@@ -97,18 +97,19 @@ export function initCube(geo, mat, scene) {
  * @repeat 贴图重复 Array
  * @scene 场景
  */
-export function createCube(geo, face, pos, rotate, repeat, scene) {
+export function createCube(geo, face, pos, rotate, repeat, scene, isImg, road) {
+    let color = road ? 0x006500 : 0x656565;
     let geometry = new t.CubeGeometry(1, 1, 1);
     let texture;
     let material = face.map(item => {
-        if (item) {
+        if (item && isImg) {
             texture = new t.TextureLoader().load(item);
             texture.wrapS = t.RepeatWrapping;
             texture.wrapT = t.RepeatWrapping;
             texture.repeat.set(...repeat);
             return new t.MeshPhongMaterial({ map: texture });
         } else {
-            return new t.MeshLambertMaterial({ color: 0x959595 });
+            return new t.MeshLambertMaterial({ color });
         }
     });
     let mesh = new t.Mesh(geometry, material);

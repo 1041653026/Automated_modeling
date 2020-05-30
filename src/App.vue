@@ -49,8 +49,11 @@
           <div class="change-left" @click='changeLeft'>&lt;</div>
           <div class="change-right" @click='changeRight'>&gt;</div>
         </div>
-        <div class="picList-title">贴图列表</div>
-        <div class="picList-main">
+        <div class="picList-title">
+          <span style='margin-right: 5vw;'>贴图列表</span>
+          <el-button type="success" size="mini" @click='changeImg'>{{isShowImg ? '取消贴图' : '一键贴图'}}</el-button>
+        </div>
+        <div class="picList-main" style='margin-top: 3vh;'>
           <div class="picList-inner" ref='picList'>
             <template v-for='(item, i) in picList'>
               <div :key='i' class='picList-sub'>
@@ -187,18 +190,19 @@ export default {
       water: '',
       water2: '',
       showSide: false,          // 是否展示侧边栏
-      picList: ['/juminlou.jpg', 'nv.jpg', 'lou.jpg', 'loufang.png', 'map.jpg'],
+      picList: ['/juminlou.png', 'louback.png', 'louside.png', 'louding.png', 'juminlou1.png', 'juminlou2.png', 'juminlou3.png'],
       picListMove: 0,           // 图片列表的移动
       picListMove2: 0,           // 图片列表的移动
       showOpeateData: false,    // 是否展示添加、修改房屋侧边栏
       operateState: 'show',          // 操作页面状态,三种状态，show：数据，create: 生成房屋， config: 修改房屋
       needConfig: '',           // 需要修改的房屋
       isShowHelper: false,      // 展示坐标系;
+      isShowImg: false,         // 是否展示贴图
       cubeData: [{
         id: 0,
-        name: '左一',
+        name: '#1',
         size: [84, 60, 40],
-        face: ['/juminlou.jpg', '/juminlou.jpg', '', '', '/juminlou.jpg', '/juminlou.jpg'],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
         pos: [-23.5, 30, -82],
         rotate: [0, 0.07, 0],
         repeat: [1,1],
@@ -206,9 +210,9 @@ export default {
         cur: null
       }, {
         id: 1,
-        name: '左二',
+        name: '#2',
         size: [150, 60, 40],
-        face: ['/juminlou.jpg', '/juminlou.jpg', '', '', '/juminlou.jpg', '/juminlou.jpg'],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
         pos: [27, 30, -20],
         rotate: [0, 0.06, 0],
         repeat: [2,1],
@@ -216,30 +220,350 @@ export default {
         cur: null
       }, {
         id: 2,
-        name: '左三',
+        name: '#3',
         size: [132, 60, 43],
-        face: ['/juminlou.jpg', '/juminlou.jpg', '', '', '/juminlou.jpg', '/juminlou.jpg'],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
         pos: [30, 30, 55],
+        rotate: [0, 0.07, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 3,
+        name: '#4',
+        size: [130, 60, 38],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
+        pos: [35, 30, 118],
+        rotate: [0, 0.07, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 4,
+        name: '#5',
+        size: [125, 60, 42],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
+        pos: [180, 30, -7],
+        rotate: [0, -0.08, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 5,
+        name: '#6',
+        size: [120, 60, 41],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
+        pos: [193, 30, 103],
+        rotate: [0, 0.07, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 6,
+        name: '#7',
+        size: [120, 60, 41],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
+        pos: [-300, 30, 103],
+        rotate: [0, 0, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 7,
+        name: '#8',
+        size: [120, 60, 41],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
+        pos: [-300, 30, 103],
+        rotate: [0, 0, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 8,
+        name: '#9',
+        size: [120, 60, 41],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
+        pos: [-300, 30, 3],
+        rotate: [0, 0, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 9,
+        name: '#10',
+        size: [120, 60, 41],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
+        pos: [-300, 30, -103],
+        rotate: [0, 0, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 10,
+        name: '#11',
+        size: [130, 60, 38],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/louback.png', '/juminlou.png'],
+        pos: [35, 30, 200],
+        rotate: [0, 0, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 11,
+        name: '#12',
+        size: [130, 60, 38],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/louback.png', '/juminlou.png'],
+        pos: [195, 30, 200],
+        rotate: [0, 0, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 12,
+        name: '#13',
+        size: [100, 60, 38],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/louback.png', '/juminlou.png'],
+        pos: [335, 30, 200],
+        rotate: [0, 0, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 13,
+        name: '#14',
+        size: [100, 60, 38],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
+        pos: [335, 30, 110],
+        rotate: [0, 0, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 14,
+        name: '#15',
+        size: [100, 60, 38],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
+        pos: [335, 30, -20],
+        rotate: [0, 0, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 15,
+        name: '#16',
+        size: [100, 60, 38],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
+        pos: [335, 30, -100],
+        rotate: [0, 0, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 16,
+        name: '#17',
+        size: [100, 60, 38],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
+        pos: [335, 30, -190],
+        rotate: [0, 0, 0],
+        repeat: [2,1],
+        show: true,
+        cur: null
+      }, {
+        id: 17,
+        name: '#18',
+        size: [84, 60, 40],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
+        pos: [-23.5, 30, -182],
         rotate: [0, 0.07, 0],
         repeat: [1,1],
         show: true,
         cur: null
       }, {
-        id: 3,
-        name: '左四',
-        size: [130, 60, 38],
-        face: ['/juminlou.jpg', '/juminlou.jpg', '', '', '/juminlou.jpg', '/juminlou.jpg'],
-        pos: [35, 30, 118],
-        rotate: [0, 0.07, 0],
+        id: 18,
+        name: '#19',
+        size: [100, 60, 38],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
+        pos: [185, 30, -100],
+        rotate: [0, 0, 0],
+        repeat: [1,1],
+        show: true,
+        cur: null
+      }, {
+        id: 19,
+        name: '#20',
+        size: [100, 60, 38],
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
+        pos: [185, 30, -190],
+        rotate: [0, 0, 0],
         repeat: [1,1],
         show: true,
         cur: null
       }],
-      treeData: [ {
-        id: 0,
+      treeData: [ 
+      //   {
+      //   id: 0,
+      //   type: 'songshu',
+      //   pos: [-30, 3, 180],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 1,
+      //   type: 'songshu',
+      //   pos: [-50, 3, 180],
+      //   scale: [0.05,0.05,0.05]
+      // }, 
+      // {
+      //   id: 2,
+      //   type: 'songshu',
+      //   pos: [245, 3, 51],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 3,
+      //   type: 'songshu',
+      //   pos: [215, 3, 58],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 4,
+      //   type: 'songshu',
+      //   pos: [195, 3, 61],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 5,
+      //   type: 'songshu',
+      //   pos: [165, 3, 64],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 6,
+      //   type: 'songshu',
+      //   pos: [135, 3, 67],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 7,
+      //   type: 'songshu',
+      //   pos: [215, 3, 45],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 8,
+      //   type: 'songshu',
+      //   pos: [195, 3, 42],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 9,
+      //   type: 'songshu',
+      //   pos: [165, 3, 39],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 10,
+      //   type: 'songshu',
+      //   pos: [135, 3, 36],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 11,
+      //   type: 'songshu',
+      //   pos: [105, 3, 67],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 12,
+      //   type: 'songshu',
+      //   pos: [105, 3, 36],
+      //   scale: [0.05,0.05,0.05]
+      // },
+      // {
+      //   id: 13,
+      //   type: 'songshu',
+      //   pos: [255, 3, 21],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 14,
+      //   type: 'songshu',
+      //   pos: [270, 3, 0],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 15,
+      //   type: 'songshu',
+      //   pos: [285, 3, -20],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 16,
+      //   type: 'songshu',
+      //   pos: [300, 3, -40],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 17,
+      //   type: 'songshu',
+      //   pos: [315, 3, -60],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 18,
+      //   type: 'songshu',
+      //   pos: [300, 3, -60],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 19,
+      //   type: 'songshu',
+      //   pos: [280, 3, -60],
+      //   scale: [0.05,0.05,0.05]
+      // },
+      //  {
+      //   id: 20,
+      //   type: 'songshu',
+      //   pos: [95, 3, 10],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 21,
+      //   type: 'songshu',
+      //   pos: [55, 3, 11],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 22,
+      //   type: 'songshu',
+      //   pos: [15, 3, 13],
+      //   scale: [0.05,0.05,0.05]
+      // }, {
+      //   id: 23,
+      //   type: 'songshu',
+      //   pos: [-35, 3, 15],
+      //   scale: [0.05,0.05,0.05]
+      // }, 
+      {
+        id: 24,
         type: 'songshu',
-        pos: [-235, 30, 118],
-        scale: [0.1,0.1,0.1]
+        pos: [-75, 3, -155],
+        scale: [0.05, 0.05, 0.05]
+      }, {
+        id: 25,
+        type: 'songshu',
+        pos: [-75, 3, -55],
+        scale: [0.05, 0.05, 0.05]
+      }, {
+        id: 26,
+        type: 'songshu',
+        pos: [-75, 3, 55],
+        scale: [0.05, 0.05, 0.05]
+      }, {
+        id: 26,
+        type: 'songshu',
+        pos: [-75, 3, 195],
+        scale: [0.05, 0.05, 0.05]
+      }, {
+        id: 27,
+        type: 'songshu',
+        pos: [-135, 3, -155],
+        scale: [0.05, 0.05, 0.05]
+      }, {
+        id: 28,
+        type: 'songshu',
+        pos: [-135, 3, -55],
+        scale: [0.05, 0.05, 0.05]
+      }, {
+        id: 29,
+        type: 'songshu',
+        pos: [-135, 3, 55],
+        scale: [0.05, 0.05, 0.05]
+      }, {
+        id: 31,
+        type: 'songshu',
+        pos: [-135, 3, 195],
+        scale: [0.05, 0.05, 0.05]
       }],
       homeForm: {
         name: '',
@@ -270,16 +594,19 @@ export default {
     this.scene = t.initScene();
     //设置场景对象Scene的雾化属性.fog来模拟生活中雾化效果
     // this.scene.fog = new t.default.Fog(0xcccccc, 1, 1000);
-    this.camera = t.initCamera({type: 'perspective', data: [45, this.width / this.height, 0.01, 100000]}, {pos: [300, 200, 100], lookAt: [0,0,0]});
+    this.camera = t.initCamera({type: 'perspective', data: [45, this.width / this.height, 0.01, 100000]}, {pos: [-240, 120, 350], lookAt: [0,0,0]});
     this.light = t.initLight('ambient', [0xffffff], [0,0,300], this.scene);
-    this.pointLight = t.initLight('point',[{color: 0xffffff,intensity: 0.2  }], [500,600,400], this.scene)
+    this.pointLight = t.initLight('point',[{color: 0xffffff,intensity: 0.2 }], [500,600,400], this.scene)
     this.helper = t.initHelper();
-    this.water = t.initWater([55, 365], [-105, 1, -40], [-Math.PI / 2, 0, 0], this.pointLight, this.scene);
-    this.water2 = t.initWater([55, 50], [-105, 1, 200], [-Math.PI / 2, 0, 0], this.pointLight, this.scene);
+    this.water = t.initWater([55, 365], [-105, 2, -40], [-Math.PI / 2, 0, 0], this.pointLight, this.scene);
+    this.water2 = t.initWater([55, 50], [-105, 2, 200], [-Math.PI / 2, 0, 0], this.pointLight, this.scene);
     t.initSkyBox(this.scene);
-    t.createCube([800, 1, 451], ['', '', '/map.jpg', '', '', ''], [0,-1,0], [0,0,0], [1,1], this.scene);
+    // t.createCube([800, 1, 451], ['', '', '/map.jpg', '', '', ''], [0,-1,0], [0,0,0], [1,1], this.scene);
+    t.createCube([800, 1, 451], ['', '', '', '', '', ''], [0,-1,0], [0,0,0], [1,1], this.scene);
+    t.createCube([800, 1, 34], ['', '', '', '', '', ''], [0,0,158], [0,0,0], [1,1], this.scene,false, true);
+    t.createCube([34, 1, 451], ['', '', '', '', '', ''], [-200,0,0], [0,0,0], [1,1], this.scene,false, true);
     this.cubeData.forEach(item => {
-      item.cur = t.createCube(item.size, item.face, item.pos, item.rotate, item.repeat, this.scene);
+      item.cur = t.createCube(item.size, item.face, item.pos, item.rotate, item.repeat, this.scene, this.isShowImg);
     });
     this.treeData.forEach(item => {
       t.createTree(item.type, item.pos, item.scale, this.scene);
@@ -318,6 +645,14 @@ export default {
         console.log(9999)
         this.submitForm();
       }
+    },
+    // 控制贴图
+    changeImg() {
+      this.isShowImg = !this.isShowImg;
+      this.cubeData.forEach(item => {
+        this.scene.remove(item.cur);
+        item.cur = t.createCube(item.size, item.face, item.pos, item.rotate, item.repeat, this.scene, this.isShowImg);
+      });
     },
     // 打开坐标系
     openHelper() {
@@ -482,7 +817,7 @@ export default {
       let _rotate = [+rotateX, +rotateY, +rotateZ];
       let _repeat = [+repeatX, +repeatY];
       if (this.operateState === 'create') {
-        !name && (name = '#' + this.cubeData.length + '号房');
+        !name && (name = '#' + this.cubeData.length);
         let temp = {
           id: this.cubeData.length,
           name,

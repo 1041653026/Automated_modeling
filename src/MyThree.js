@@ -1,6 +1,7 @@
 import * as t from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { Water } from 'three/examples/jsm/objects/Water';
 
 export default t;
 /***
@@ -97,7 +98,7 @@ export function initCube(geo, mat, scene) {
  * @scene 场景
  */
 export function createCube(geo, face, pos, rotate, repeat, scene) {
-    let geometry = new t.CubeGeometry(...geo);
+    let geometry = new t.CubeGeometry(1, 1, 1);
     let texture;
     let material = face.map(item => {
         if (item) {
@@ -111,6 +112,7 @@ export function createCube(geo, face, pos, rotate, repeat, scene) {
         }
     });
     let mesh = new t.Mesh(geometry, material);
+    mesh.scale.set(...geo)
     pos && mesh.position.set(...pos);
     !pos && mesh.position.set(geo[0] / 2, geo[1] / 2, geo[2] / 2);
     mesh.rotation.set(...rotate)
@@ -145,18 +147,56 @@ export function animation(fn) {
  * 初始化坐标系
  * @scene 场景
  */
-export function initHelper(scene) {
+export function initHelper() {
     let axis = new t.AxesHelper(300);
-    scene.add(axis);
-
     let grid = new t.GridHelper(400, 20, 0xFF00FF, 0x00FF00);
-    scene.add(grid);
+    return [axis, grid];
 }
 
 /***
+ * 初始化天空盒
+ * @scene 场景
+ */
+export function initSkyBox(scene) {
+    scene.background = new t.CubeTextureLoader().load(['/px.jpg', '/nx.jpg', '/py.jpg', '/ny.jpg', '/pz.jpg', '/nz.jpg']);
+}
+
+/***
+ * 初始化Water
+ * @size  大小     [1000,1000]
+ * @scene 场景
+ * @light 灯光
+ */
+export function initWater(size, pos, rotate, light, scene) {
+    let waterGeometry = new t.PlaneBufferGeometry(...size);
+    let water = new Water(
+        waterGeometry, {
+
+            waterNormals: new t.TextureLoader().load('/water.jpg', function(texture) {
+
+                texture.wrapS = texture.wrapT = t.RepeatWrapping;
+
+            }),
+            alpha: 1.0,
+            sunDirection: light.position.clone().normalize(),
+            sunColor: 0xffffff,
+            waterColor: 0x5599FF,
+            distortionScale: 5.7,
+            flowDirection: new t.Vector2(-60, 0),
+            textureWidth: 2048,
+            textureHeight: 2048
+        }
+    );
+    water.position.set(...pos);
+    water.rotation.set(...rotate);
+    scene.add(water);
+
+    return water;
+}
+/***
  * 初始化控制器
  * @camera 相机
- * @renderer 渲染器
+ * @r 渲染器
  * @render 渲染函数
  */
 export function initControler(camera, renderer, render) {
@@ -167,56 +207,51 @@ export function initControler(camera, renderer, render) {
 /***
  * 加载模型
  */
-export function loadModel(type, url, scene, fn) {
+export function loadModel(type, url, pos, scale, scene, fn) {
     let loader, model;
-    let color = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0x00ffff, 0xff00ff, 0x950023];
+    // let color = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0x00ffff, 0xff00ff, 0x950023];
+    console.log(99999, type, url, pos, scale)
     switch (type) {
         case 'gltf':
         default:
             loader = new GLTFLoader();
             loader.load(url, function(gltf) {
                 model = gltf.scene;
-                let i = 0;
-                // (function() {
-                //     gltf.scene.traverse(child => {
-                //         if (child instanceof t.Mesh && child.material instanceof t.Material) {
-                //             console.log(333333333, child, color[i])
-                //             let new_material = child.material.clone();
-                //             new_material.side = t.DoubleSide;
-                //             child.material = new_material;
-                //             // child.material.color = new t.Color(0x959595);
-                //             child.material.color = new t.Color(color[i]);
-                //             i++;
-                //         }
-                //     });
-                // })(i)
+                // let i = 0;
                 gltf.scene.traverse(child => {
                     if (child instanceof t.Mesh && child.material instanceof t.Material) {
-                        console.log(333333333, child)
                         let new_material = child.material.clone();
-                        // let new_material = new t.MeshPhongMaterial({
-                        //     map: t.ImageUtils.loadTexture('/lou.jpg')
-                        // });
                         new_material.side = t.DoubleSide;
                         child.material = new_material;
-                        child.material.color = new t.Color(0x959595);
-                        child.material.color = new t.Color(color[i]);
-                        if (i === 6) {
-                            new_material = new t.MeshPhongMaterial({
-                                map: t.ImageUtils.loadTexture('/nv.jpg')
-                            });
-                            new_material.side = t.DoubleSide;
-                            child.material = new_material;
-                        }
-                        i++;
+                        // child.material.color = new t.Color(0x002500);
+                        // child.material.color = new t.Color(color[i]);
+                        // i++;
                     }
                 });
-                gltf.scene.scale.x = 10;
-                gltf.scene.scale.y = 10;
-                gltf.scene.scale.z = 10;
-                model.position.x = 0;
-                model.position.y = 0;
-                model.position.z = 0;
+                // gltf.scene.traverse(child => {
+                //     if (child instanceof t.Mesh && child.material instanceof t.Material) {
+                //         console.log(333333333, child)
+                //         let new_material = child.material.clone();
+                //         // let new_material = new t.MeshPhongMaterial({
+                //         //     map: t.ImageUtils.loadTexture('/lou.jpg')
+                //         // });
+                //         new_material.side = t.DoubleSide;
+                //         child.material = new_material;
+                //         child.material.color = new t.Color(0x959595);
+                //         child.material.color = new t.Color(color[i]);
+                //         if (i === 6) {
+                //             new_material = new t.MeshPhongMaterial({
+                //                 map: t.ImageUtils.loadTexture('/nv.jpg')
+                //             });
+                //             new_material.side = t.DoubleSide;
+                //             child.material = new_material;
+                //         }
+                //         i++;
+                //     }
+                // });
+
+                model.scale.set(...scale);
+                model.position.set(...pos);
                 scene.add(model);
                 fn && fn(model);
             }, undefined, function(e) {
@@ -225,6 +260,13 @@ export function loadModel(type, url, scene, fn) {
     }
 }
 
+/***
+ * 加载模型
+ */
+
+export function createTree(type, pos, scale, scene) {
+    loadModel('gltf', `/${type}/scene.gltf`, pos, scale, scene);
+}
 /***
  * 点击事件
  */

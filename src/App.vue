@@ -1,11 +1,20 @@
 <template>
   <div id="app">
+    <!-- three.js构建的场景将会动态放在这个box里 -->
     <div class="box" ref='box'></div>
+
+    <!-- 以下为控制区域html -->
     <div class="operate" :style='{width: showSide ? "30vw" : 0}'>
+
+      <!-- 侧边栏控制按钮开始 -->
       <div class="control" @click='changeShowSide'>
         {{`${showSide ? '&gt;&gt;&gt;' : '&lt;&lt;&lt;'}`}}
       </div>
+      <!-- 侧边栏控制按钮结束 -->
+
       <div class="title">自定义模型构建</div>
+
+      <!-- 房屋列表开始 -->
       <div class="homeTable">
         <div class="table-title">
           <span style='margin-right: 5vw;'>房屋列表</span>
@@ -44,6 +53,9 @@
           </el-table-column>
         </el-table>
       </div>
+      <!-- 房屋列表结束 -->
+
+      <!-- 贴图列表开始 -->
       <div class="picList">
         <div class="change-box" v-if='picList.length > 3'>
           <div class="change-left" @click='changeLeft'>&lt;</div>
@@ -64,9 +76,11 @@
           </div>
         </div>
       </div>
+      <!-- 贴图列表结束 -->
+
       <div class="treeTable"></div>
 
-      <!-- 以下是操作模块 -->
+      <!-- 以下是模型数据操作模块，用于创建和修改模型 -->
       <div :class="{'operate-data': true, 'operate-data-show': operateState !== 'show'}">
         <div class="returnBtn" @click='returnBtnEvent'>
           <svg t="1590760054907" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1226" width="30" height="30"><path d="M916.3 466.3H218.1l288.4-288.4c17.8-17.8 17.8-46.9 0-64.7-17.8-17.8-46.9-17.8-64.7 0L75.3 479.7c-17.8 17.8-17.8 46.9 0 64.7l366.5 366.5c17.8 17.8 46.9 17.8 64.7 0 17.8-17.8 17.8-46.9 0-64.7L218.1 557.7h698.2c25.2 0 45.7-20.6 45.7-45.7 0-25.2-20.6-45.7-45.7-45.7z" fill="" p-id="1227"></path></svg>
@@ -150,6 +164,7 @@
             <el-button type="primary" @click='openHelper'>{{isShowHelper ? '关闭坐标系' : '打开坐标系'}}</el-button>
           </el-form-item>
         </el-form>
+        <!-- 贴图列表 -->
         <div class="picList">
           <div class="change-box" v-if='picList.length > 3'>
             <div class="change-left" @click='changeLeft2'>&lt;</div>
@@ -173,41 +188,45 @@
 </template>
 
 <script>
-import * as t from './MyThree'
+import * as t from './MyThree';       //引入我们封装的three.js文件
+
 export default {
   name: 'App',
+  // 数据统一放在这个data函数中
   data() {
     return {
-      renderer: '', 
-      scene: '',
-      camera: '',
-      width: 1000,
-      height: 1000,
-      light: '',
-      pointLight: '',
-      cube: '',
-      helper: '',
-      water: '',
-      water2: '',
+      renderer: '',           // 渲染器
+      scene: '',              // 场景
+      camera: '',             // 相机
+      width: 1000,            // 画布宽度
+      height: 1000,           // 画布高度
+      light: '',              // 环境光
+      pointLight: '',         // 点光源
+      cube: '',               // 方块
+      helper: '',             // 坐标系
+      water: '',              // 水流1
+      water2: '',             // 水流2
       showSide: false,          // 是否展示侧边栏
-      picList: ['/juminlou.png', 'louback.png', 'louside.png', 'louding.png', 'juminlou1.png', 'juminlou2.png', 'juminlou3.png'],
-      picListMove: 0,           // 图片列表的移动
-      picListMove2: 0,           // 图片列表的移动
+      picList: ['/juminlou.png', 'louback.png', 'louside.png', 'louding.png', 'juminlou1.png', 'juminlou2.png', 'juminlou3.png'], // 贴图列表数据,记录贴图路径
+      picListMove: 0,           // 贴图列表1的移动
+      picListMove2: 0,          // 贴图列表2的移动
       showOpeateData: false,    // 是否展示添加、修改房屋侧边栏
-      operateState: 'show',          // 操作页面状态,三种状态，show：数据，create: 生成房屋， config: 修改房屋
-      needConfig: '',           // 需要修改的房屋
-      isShowHelper: false,      // 展示坐标系;
-      isShowImg: false,         // 是否展示贴图
+      operateState: 'show',     // 操作页面状态,三种状态，show：展示数据，create: 生成房屋， config: 修改房屋
+      needConfig: '',           // 需要修改的房屋对象
+      isShowHelper: false,      // 是否展示坐标系;
+      isShowImg: false,         // 是否展示贴图，用于控制一键贴图
+
+      // 以下为房屋数据列表，通过这个数据列表驱动网页房屋的显示
       cubeData: [{
-        id: 0,
-        name: '#1',
-        size: [84, 60, 40],
-        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],
-        pos: [-23.5, 30, -82],
-        rotate: [0, 0.07, 0],
-        repeat: [1,1],
-        show: true,
-        cur: null
+        id: 0,                        // 每个房屋特有id
+        name: '#1',                   // 房屋名称
+        size: [84, 60, 40],           // 房屋大小[x,y,z]
+        face: ['/louside.png', '/louside.png', '/louding.png', '', '/juminlou.png', '/louback.png'],  // 房屋贴图[前，后，上，下，左，右]，x轴正方向为前
+        pos: [-23.5, 30, -82],        // 房屋在世界坐标系的位置，three.js构建的是世界坐标系，即坐标轴所在坐标系，其他位置也是根据世界坐标系生成的
+        rotate: [0, 0.07, 0],         // 房屋旋转[x,y,z]
+        repeat: [1,1],                // 贴图重复[x,y]
+        show: true,                   // 是否展示贴图
+        cur: null                     // 基于此数据构建的模型Object
       }, {
         id: 1,
         name: '#2',
@@ -399,12 +418,14 @@ export default {
         show: true,
         cur: null
       }],
+
+      // 以下为树木数据列表，根据这个数据列表来生成树木，由于性能问题，减少了大部分树木的构建，因为模型越多对浏览器压力越大，对设配配置要求越高，占用电脑内存较大
       treeData: [ 
       //   {
-      //   id: 0,
-      //   type: 'songshu',
-      //   pos: [-30, 3, 180],
-      //   scale: [0.05,0.05,0.05]
+      //   id: 0,                         // 每棵树特有id
+      //   type: 'songshu',               // 树木类型，目前只有松树
+      //   pos: [-30, 3, 180],            // 树木位置
+      //   scale: [0.05,0.05,0.05]        // 树木缩放 [x,y,z]
       // }, {
       //   id: 1,
       //   type: 'songshu',
@@ -565,6 +586,8 @@ export default {
         pos: [-135, 3, 195],
         scale: [0.05, 0.05, 0.05]
       }],
+
+      // 房屋修改及添加表单，这些都是根据房屋数据的属性生成的，具体可对照房屋数据
       homeForm: {
         name: '',
         sizeX: '',
@@ -587,45 +610,48 @@ export default {
       },
     }
   },
+  // 生命周期钩子，网页构建完成时执行的函数
   mounted() {
+    // 获取三维场景外box的宽高
     this.width = this.$refs.box.getBoundingClientRect().width;
     this.height = this.$refs.box.getBoundingClientRect().height;
+    // 以下将会按顺序构建三维场景
+    // 初始化渲染器
     this.renderer = t.initRenderer(this.$refs.box);
+    // 初始化场景
     this.scene = t.initScene();
-    //设置场景对象Scene的雾化属性.fog来模拟生活中雾化效果
+    //设置场景对象Scene的雾化属性.fog来模拟生活中雾化效果,该雾化效果未用
     // this.scene.fog = new t.default.Fog(0xcccccc, 1, 1000);
+    // 初始化摄像机
     this.camera = t.initCamera({type: 'perspective', data: [45, this.width / this.height, 0.01, 100000]}, {pos: [-240, 120, 350], lookAt: [0,0,0]});
+    // 初始化环境光
     this.light = t.initLight('ambient', [0xffffff], [0,0,300], this.scene);
-    this.pointLight = t.initLight('point',[{color: 0xffffff,intensity: 0.2 }], [500,600,400], this.scene)
+    // 初始化点光源
+    this.pointLight = t.initLight('point',[{color: 0xffffff,intensity: 0.2 }], [500,600,400], this.scene);
+    // 初始化坐标系
     this.helper = t.initHelper();
+    // 初始化河流
     this.water = t.initWater([55, 365], [-105, 2, -40], [-Math.PI / 2, 0, 0], this.pointLight, this.scene);
     this.water2 = t.initWater([55, 50], [-105, 2, 200], [-Math.PI / 2, 0, 0], this.pointLight, this.scene);
+    // 初始化天空盒
     t.initSkyBox(this.scene);
     // t.createCube([800, 1, 451], ['', '', '/map.jpg', '', '', ''], [0,-1,0], [0,0,0], [1,1], this.scene);
+    // 生成地面
     t.createCube([800, 1, 451], ['', '', '', '', '', ''], [0,-1,0], [0,0,0], [1,1], this.scene);
+    // 生成路面
     t.createCube([800, 1, 34], ['', '', '', '', '', ''], [0,0,158], [0,0,0], [1,1], this.scene,false, true);
     t.createCube([34, 1, 451], ['', '', '', '', '', ''], [-200,0,0], [0,0,0], [1,1], this.scene,false, true);
+    // 根据房屋列表数据生成房屋模型
     this.cubeData.forEach(item => {
       item.cur = t.createCube(item.size, item.face, item.pos, item.rotate, item.repeat, this.scene, this.isShowImg);
     });
+    // 根据树木列表数据生成树木模型
     this.treeData.forEach(item => {
       t.createTree(item.type, item.pos, item.scale, this.scene);
     });
-    console.log(this.cubeData)
-    // t.loadModel('gltf', '/box.glb', this.scene, model => {
-    //   this.model = model;
-    //   this.renderer.domElement.addEventListener('click', (e) => {
-    //     let x = (e.offsetX / this.width) * 2 - 1;
-    //     let y = (e.offsetY / this.height) * 2 + 1;
-    //     let mouse = new t.default.Vector2(x, y);
-
-    //     let raycaster = new t.default.Raycaster();
-    //     raycaster.setFromCamera(mouse, this.camera);
-    //     let intersects = raycaster.intersectObjects(model.children)
-    //     console.log(intersects)
-    //   })
-    // });
+    // 添加控制器，并传入渲染函数animation
     this.control = t.initControler(this.camera, this.renderer, t.animation(() => {
+      // 控制水波动
       this.water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
       this.water2.material.uniforms[ 'time' ].value += 1.0 / 60.0;
       this.renderer.render(this.scene, this.camera);
@@ -633,20 +659,22 @@ export default {
     // t.animation(() => {
     //   this.renderer.render(this.scene, this.camera);
     // })
+
+    // 监听Enter键点击事件
     document.addEventListener('keydown', this.enterEvent);
   },
   beforeDestroy() {
     document.removeEventListener('keydown', this.enterEvent);
   },
   methods: {
-    // enter按键
+    // enter按键，点击Enter用于快速生成/修改模型，利于模型大小位置等信息的调试
     enterEvent(e) {
       if (e.keyCode === 13 && this.operateState !== 'show') {
-        console.log(9999)
+        // console.log(9999)
         this.submitForm();
       }
     },
-    // 控制贴图
+    // 控制贴图，也就是一键贴图按钮绑定的事件
     changeImg() {
       this.isShowImg = !this.isShowImg;
       this.cubeData.forEach(item => {
@@ -721,7 +749,7 @@ export default {
         this.scene.remove(item.cur);
       }
     },
-    // 修改房屋数据
+    // 修改房屋数据，将要修改的房屋数据提交给表单
     configHomeData(item) {
       this.changeOperateState('config');
       this.needConfig = item;
@@ -753,11 +781,11 @@ export default {
       this.scene.remove(item.cur);
       this.cubeData.splice(this.cubeData.indexOf(item), 1)
     },
-    // 添加房屋
+    // 添加房屋事件
     changeOperateState(item) {
       this.operateState = item;
     },
-    // 返回展示侧边栏
+    // 返回展示侧边栏，顶部返回按钮事件
     returnBtnEvent() {
       this.homeForm = {
         name: '',
@@ -782,8 +810,10 @@ export default {
       this.changeOperateState("show");
       this.needConfig = '';
     },
+    // 提交表单
     submitForm() {
       let {name, sizeX, sizeY, sizeZ, posX, posY, posZ, faceQ, faceH, faceZ, faceY, faceS, faceX, rotateX, rotateY, rotateZ, repeatX, repeatY} = this.homeForm;
+      // 数据防止空值，添加默认值
       !sizeX && (sizeX = 50);
       !sizeY && (sizeY = 60);
       !sizeZ && (sizeZ = 30);
@@ -795,6 +825,7 @@ export default {
       !rotateZ && (rotateZ = 0);
       !repeatX && (repeatX = 1);
       !repeatY && (repeatY = 1);
+      // 脏值检测
       if (isNaN(sizeX) || isNaN(sizeY) || isNaN(sizeZ)) {
         this.$message.error('房屋大小数字格式错误，请重新填写!');
         return;
@@ -817,6 +848,7 @@ export default {
       let _rotate = [+rotateX, +rotateY, +rotateZ];
       let _repeat = [+repeatX, +repeatY];
       if (this.operateState === 'create') {
+        // 生成模型事件
         !name && (name = '#' + this.cubeData.length);
         let temp = {
           id: this.cubeData.length,
@@ -833,6 +865,7 @@ export default {
         this.cubeData.push(temp);
         this.returnBtnEvent();
       } else if (this.operateState === 'config') {
+        // 修改模型事件
         !name && (name = this.needConfig.name);
         let temp = {
           id: this.needConfig.id,
@@ -851,6 +884,7 @@ export default {
         this.needConfig = temp;
       }
     },
+    // 重置表单事件
     resetForm() {
       this.homeForm = {
         name: '',
@@ -877,7 +911,9 @@ export default {
 }
 </script>
 
+
 <style lang='scss' scoped>
+// 这里是网页样式css代码
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

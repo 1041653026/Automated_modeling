@@ -1,13 +1,30 @@
-import * as t from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { Water } from 'three/examples/jsm/objects/Water';
+import * as t from 'three'; // 引入three.js
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'; // 引入three.js控制器
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'; // 引入gltf模型加载loader
+import { Water } from 'three/examples/jsm/objects/Water'; // 引入水流
 
 export default t;
+
+/***
+ * three.js创建三维场景思路
+ * 创建三维场景必备的模块有scene,camera,light,renderer,animation
+ * @scene      场景,相当于画布，什么模型，立方体，灯光等都要放在场景上展示
+ * @camera     摄像机，相当于摄像机或者人眼，也就是我们所看到的场景区域为摄像机视角区域
+ * @light      灯光，场景没有灯光就是一片黑，什么也看不到，一般来说要有两种以上的灯光，本项目用了环境光和点光源
+ * @renderer   渲染器，相当于画笔，用来渲染场景和相机的
+ * @animation  渲染函数，页面上的场景需要不断的渲染绘制，类似于动画的帧，也是一帧一帧的去渲染的
+ * 以上为主要组成部分，其他模型、立方体、水流等都是在scene上进行渲染的，如果用到直接用scene.add()方法添加到场景中就可以，不用的时候直接scene.remove()
+ * 移除掉就不会在场景上显示了。
+ */
+
+
+/*---------------下面对three.js用到的模块进行了封装，利于调用-----------------------*/
+
+
 /***
  * 初始化渲染器
- * @dom  元素       Object
- * @color 刷新颜色  ?Array
+ * @dom  元素       Object          挂载renderer生成的canvas画布的html元素
+ * @color 刷新颜色  ?Array          用于清除画布的颜色
  */
 export function initRenderer(dom, color) {
     let renderer, obj, width, height;
@@ -58,10 +75,10 @@ export function initCamera(para, data) {
 export function initLight(type, para, pos, scene) {
     let light;
     switch (type) {
-        case 'point':
+        case 'point': // 点光源
             light = new t.PointLight(...para);
             break;
-        case 'ambient':
+        case 'ambient': // 环境光
         default:
             light = new t.AmbientLight(...para);
     }
@@ -89,13 +106,15 @@ export function initCube(geo, mat, scene) {
 }
 
 /***
- * 生成一个立方体
+ * 生成一个立方体房屋
  * @geo  立方体属性 Array            [10,10,10]
  * @face 面贴图     Array            ['/face.jpg' 前, '' 后, '/face.jpg' 上, '' 下,'/face.jpg' 左, '' 右]     坐标系x轴正方向为前
  * @pos  立方体位置 Array            [10,10,10] 立方体的位置是立方体中心的位置
- * @rotate 缩放     Array
- * @repeat 贴图重复 Array
- * @scene 场景
+ * @rotate 缩放     Array            [1,1,]
+ * @repeat 贴图重复 Array            [1,1]
+ * @isImg 是否贴图  Boolean          如果为false为白模状态，如果为true显示贴图
+ * @scene 场景      Object
+ * @road  构建的是否是小路，如果是路颜色为绿色    Boolean
  */
 export function createCube(geo, face, pos, rotate, repeat, scene, isImg, road) {
     let color = road ? 0x006500 : 0x656565;
@@ -122,7 +141,7 @@ export function createCube(geo, face, pos, rotate, repeat, scene, isImg, road) {
 }
 
 /***
- * 初始化一个球体
+ * 初始化一个球体（未使用球体构建）
  * @geo 球体属性 Array
  * @mat 材质属性 Array
  * @scene  场景
@@ -159,12 +178,15 @@ export function initHelper() {
  * @scene 场景
  */
 export function initSkyBox(scene) {
+    // 天空盒为六张图片作为scene背景
     scene.background = new t.CubeTextureLoader().load(['/px.jpg', '/nx.jpg', '/py.jpg', '/ny.jpg', '/pz.jpg', '/nz.jpg']);
 }
 
 /***
  * 初始化Water
  * @size  大小     [1000,1000]
+ * @pos   位置
+ * @rotate 旋转
  * @scene 场景
  * @light 灯光
  */
@@ -194,8 +216,9 @@ export function initWater(size, pos, rotate, light, scene) {
 
     return water;
 }
+
 /***
- * 初始化控制器
+ * 初始化控制器,用来控制场景
  * @camera 相机
  * @r 渲染器
  * @render 渲染函数
@@ -206,7 +229,13 @@ export function initControler(camera, renderer, render) {
 }
 
 /***
- * 加载模型
+ * 加载模型,主要用来加载树木模型
+ * @type    加载模型的格式，为gltf格式，模型较小，利于前端渲染
+ * @url     模型路径
+ * @pos     模型位置
+ * @scale   模型放缩
+ * @scene   场景
+ * @fn      模型加载完成后的回调函数
  */
 export function loadModel(type, url, pos, scale, scene, fn) {
     let loader, model;
@@ -262,14 +291,19 @@ export function loadModel(type, url, pos, scale, scene, fn) {
 }
 
 /***
- * 加载模型
+ * 创建树木
+ * @type     树木类型，可加载其他类型树木模型，目前只做了松树
+ * @pos      树木位置
+ * @scale    树木放缩
+ * @scene    场景
  */
 
 export function createTree(type, pos, scale, scene) {
     loadModel('gltf', `/${type}/scene.gltf`, pos, scale, scene);
 }
+
 /***
- * 点击事件
+ * 点击事件（用不上点击事件）
  */
 export function initClick(camera, scene, width, height, left, top) {
     let e = window.event;
